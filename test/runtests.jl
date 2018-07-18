@@ -1,2 +1,2 @@
-include("test/graphs.jl")
-include("test/markov_chains.jl")
+include("graphs.jl")
+include("markov_chains.jl")
