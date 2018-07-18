@@ -1,7 +1,5 @@
 # MarkovChains.jl
 
-Build status:
-[![travis][travis-img]](https://travis-ci.org/wangnangg/MarkovChains.jl.svg?branch=master)
+[![Build Status](https://travis-ci.org/wangnangg/MarkovChains.jl.svg?branch=master)](https://travis-ci.org/wangnangg/MarkovChains.jl)
 
-Code coverage:
-[![coveralls][coveralls-img]]()
+[![Coverage Status](https://coveralls.io/repos/github/wangnangg/MarkovChains.jl/badge.svg?branch=master)](https://coveralls.io/github/wangnangg/MarkovChains.jl?branch=master)
