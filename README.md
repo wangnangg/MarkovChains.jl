@@ -8,9 +8,10 @@ This pacakge provides functions to solve continuous/discrete time Markov chains 
 # Example
 ## continuous time Markov chains
 
-The example is to a 4 states birth-death chain at time infinity.
+The following example is about solving a 4 states birth-death chain at time infinity.
 
 ```julia
+importall MarkovChains
 chain = ContMarkovChain()
 n0 = add_state!(chain)
 n1 = add_state!(chain)
@@ -26,7 +27,7 @@ init_prob = sparsevec([1], [1.0])
 res = inftime_state(chain, init_prob)
 @show cumtime = collect(map(state -> state_cumtime(res, state), n0:n3))
 # cumtime = [inf, inf, inf, inf]
-#show prob = collect(map(state -> state_prob(res, state), n0:n3))
+@show prob = collect(map(state -> state_prob(res, state), n0:n3))
 # prob = [0.375, 0.375, 0.1875, 0.0625]
 ```
 
