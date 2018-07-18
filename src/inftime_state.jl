@@ -23,7 +23,7 @@ function reorder_states(chain::ContMarkovChain)::Reorder
         ntrans += length(comp.members)
     end
     recur_comp_member_count = Vector{Int}()
-    for comp in filter(comp->comp.is_bottom, comps)
+    for comp in filter(comp -> comp.is_bottom, comps)
         extend!(mat2chain, comp.members)
         push!(recur_comp_member_count, length(comp.members))
     end
@@ -77,7 +77,7 @@ function ta_rate_matrix(chain, order, abs_start, abs_end)
             dst_chn = dst_node(chain.state_graph, edge)
             dst_mat = order.chain2mat[dst_chn]
             rate = chain.trans_rates[edge]
-            if dst_mat >= abs_start && dst_mat <=abs_end
+            if dst_mat >= abs_start && dst_mat <= abs_end
                 push!(rows, dst_mat - abs_start + 1)
                 push!(cols, src_mat)
                 push!(vals, rate)
@@ -151,7 +151,7 @@ function inftime_state(chain::ContMarkovChain, init_prob::SparseVector; spsolve=
         val = init_prob.nzval[i]
         mat_idx = order.chain2mat[idx]
         if mat_idx <= order.ntransients
-            sol[mat_idx] = - val
+            sol[mat_idx] = -val
         else
             sol[mat_idx] = val
         end

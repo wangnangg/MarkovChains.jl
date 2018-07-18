@@ -17,9 +17,9 @@ importall MarkovChains.Graphs
         add_edge!(dg, n1, n4)
         order = []
         dfs(dg, n1, (p, c) -> begin
-                push!(order, c)
-            end)
-    @test order == [1, 2, 3, 4]
+            push!(order, c)
+        end)
+        @test order == [1, 2, 3, 4]
     end
     @testset "scc_one_comp" begin
         dg = Digraph()

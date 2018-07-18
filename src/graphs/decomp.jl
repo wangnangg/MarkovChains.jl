@@ -60,7 +60,7 @@ function strongly_connected_components(dg::Digraph)::Vector{StronglyConnectedCom
             push!(components, StronglyConnectedComponent(mem, is_bottom))
             return false
         else
-                return is_bottom
+            return is_bottom
         end
     end
     for n in nodes(dg)

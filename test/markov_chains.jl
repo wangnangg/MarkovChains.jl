@@ -117,16 +117,16 @@ importall MarkovChains
         @test prob[m2] == 2.0 / 3.0 * 0.1
     end
     @testset "inftime_state_one_state" begin
-    chain = ContMarkovChain()
-    t0 = add_state!(chain)
-    init_prob = sparsevec([t0], [1.0])
-    res = inftime_state(chain, init_prob)
-    @test state_cumtime(res, t0) == Inf
-    @test state_prob(res, t0) == 1.0
+        chain = ContMarkovChain()
+        t0 = add_state!(chain)
+        init_prob = sparsevec([t0], [1.0])
+        res = inftime_state(chain, init_prob)
+        @test state_cumtime(res, t0) == Inf
+        @test state_prob(res, t0) == 1.0
     end
     @testset "inftime_state_zero_state" begin
-    chain = ContMarkovChain()
-    init_prob = sparsevec([], [])
-    res = inftime_state(chain, init_prob)
+        chain = ContMarkovChain()
+        init_prob = sparsevec([], [])
+        res = inftime_state(chain, init_prob)
     end
 end
