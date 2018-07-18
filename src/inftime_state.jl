@@ -35,7 +35,7 @@ function reorder_states(chain::ContMarkovChain)::Reorder
 end
 
 """
-tt_rate_matrix(chain, mat2chain, chain2mat, ntrans)
+    tt_rate_matrix(chain, mat2chain, chain2mat, ntrans)
 
 create transition rate matrix (to-from order) between transient states.
 """
@@ -62,7 +62,7 @@ function tt_rate_matrix(chain, order)
     sparse(rows, cols, vals, order.ntransients, order.ntransients)
 end
 """
-ta_rate_matrix(chain, order, abs_start, nabs)
+    ta_rate_matrix(chain, order, abs_start, nabs)
 
 create transition rate matrix (to-from order) from transient states to
 recurrent states within range abs_start, abs_start + abs
@@ -88,7 +88,7 @@ function ta_rate_matrix(chain, order, abs_start, abs_end)
 end
 
 """
-aa_rate_matrix(chain, order, abs_start, nabs)
+    aa_rate_matrix(chain, order, abs_start, nabs)
 
 create transition rate matrix (to-from order) from between
 recurrent states within range abs_start, abs_start + abs
@@ -127,6 +127,12 @@ struct InftimeStateResult
     reorder::Reorder
     solution::Vector{Float64}
 end
+
+"""
+    state_prob(result, state)
+
+used to retrieve state probablity from result.
+"""
 function state_prob(res::InftimeStateResult, state)
     state_mat = res.reorder.chain2mat[state]
     if state_mat <= res.reorder.ntransients
@@ -135,6 +141,12 @@ function state_prob(res::InftimeStateResult, state)
         res.solution[state_mat]
     end
 end
+
+"""
+    state_cumtime(result, state)
+
+used to retrieve state cumulative time from result.
+"""
 function state_cumtime(res::InftimeStateResult, state)
     state_mat = res.reorder.chain2mat[state]
     if state_mat <= res.reorder.ntransients
@@ -143,6 +155,12 @@ function state_cumtime(res::InftimeStateResult, state)
         Inf
     end
 end
+"""
+    inftime_state(chain, init_prob; spsolve)
+
+compute state cumulative times/probabilites of the markov chain at time infinity. 
+`state_prob` and `state_cumtime` can be used to retrieve times/probs from the return value.
+"""
 function inftime_state(chain::ContMarkovChain, init_prob::SparseVector; spsolve=Base.:\)
     order = reorder_states(chain)
     sol::Vector{Float64} = fill(0.0, state_count(chain))
