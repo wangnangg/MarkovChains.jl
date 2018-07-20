@@ -1,2 +1,3 @@
 include("graphs.jl")
-include("markov_chains.jl")
+include("fintime_solve.jl")
+include("inftime_solve.jl")
