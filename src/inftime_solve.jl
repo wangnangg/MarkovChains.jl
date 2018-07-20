@@ -1,6 +1,6 @@
 importall .Graphs
 
-export inftime_state, Reorder, InftimeStateResult, state_cumtime, state_prob
+export inftime_solve, Reorder, InftimeStateResult, state_cumtime, state_prob
 struct Reorder
     mat2chain::Vector{Int}
     chain2mat::Vector{Int}
@@ -161,7 +161,7 @@ end
 compute state cumulative times/probabilites of the markov chain at time infinity. 
 `state_prob` and `state_cumtime` can be used to retrieve times/probs from the return value.
 """
-function inftime_state(chain::ContMarkovChain, init_prob::SparseVector; spsolve=Base.:\)
+function inftime_solve(chain::ContMarkovChain, init_prob::SparseVector; spsolve=Base.:\)
     order = reorder_states(chain)
     sol::Vector{Float64} = fill(0.0, state_count(chain))
     for i in 1:length(init_prob.nzind)
