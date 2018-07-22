@@ -161,12 +161,11 @@ end
 compute state cumulative times/probabilites of the markov chain at time infinity. 
 `state_prob` and `state_cumtime` can be used to retrieve times/probs from the return value.
 """
-function inftime_solve(chain::ContMarkovChain, init_prob::SparseVector; spsolve=Base.:\)
+function inftime_solve(chain::ContMarkovChain, init_prob; spsolve=Base.:\)
     order = reorder_states(chain)
     sol::Vector{Float64} = fill(0.0, state_count(chain))
-    for i in 1:length(init_prob.nzind)
-        idx = init_prob.nzind[i]
-        val = init_prob.nzval[i]
+    for idx in eachindex(init_prob)
+        val = init_prob[idx]
         mat_idx = order.chain2mat[idx]
         if mat_idx <= order.ntransients
             sol[mat_idx] = -val
@@ -192,7 +191,7 @@ function inftime_solve(chain::ContMarkovChain, init_prob::SparseVector; spsolve=
         QAA = aa_rate_matrix(chain, order, abs_start, abs_end)
         b = fill(0.0, nabs)
         b[nabs] = total_prob
-        sol[abs_start:abs_end] = QAA \ b
+        sol[abs_start:abs_end] = spsolve(QAA, b)
         abs_start = abs_end + 1
     end
     return InftimeStateResult(order, sol)

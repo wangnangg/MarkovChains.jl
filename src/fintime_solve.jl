@@ -60,26 +60,38 @@ function trans_rate_matrix(chain)
     sparse(rows, cols, vals, dim, dim)
 end
 
-export fintime_solve_prob, trans_rate_matrix, trans_prob_matrix, state_prob, state_cumtime
+export fintime_solve_prob, fintime_solve_cum, trans_rate_matrix, trans_prob_matrix, state_prob, state_cumtime
 
 include("poisson_trunc.jl")
 
-function state_prob(sol::Vector{Float64}, state::Integer)
-    return sol[state]
+struct FintimeProbSolution
+    prob::Vector{Float64}
 end
 
-function state_cumtime(sol::Vector{Float64}, state::Integer)
-    return sol[state]
+struct FintimeCumSolution
+    cumtime::Vector{Float64}
 end
 
-function fintime_solve_prob(chain::ContMarkovChain, init_prob::SparseVector, time::Real; unif_rate_factor=1.05, tol=1e-6, ss_check_interval=10)
+struct FintimeSolution
+    prob::Vector{Float64}
+    cumtime::Vector{Float64}
+end
+
+function state_prob(sol::Union{FintimeProbSolution, FintimeSolution}, state::Integer)
+    return sol.prob[state]
+end
+
+function state_cumtime(sol::Union{FintimeCumSolution, FintimeSolution}, state::Integer)
+    return sol.cumtime[state]
+end
+
+function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_rate_factor=1.05, tol=1e-6, ss_check_interval=10)
     @assert unif_rate_factor >= 1.0
     unif_rate = max_out_rate(chain) * unif_rate_factor
     P = trans_prob_matrix(chain, unif_rate)
-
     prob = fill(0.0, state_count(chain))
-    for i in 1:length(init_prob.nzind)
-        prob[init_prob.nzind[i]] = init_prob.nzval[i]
+    for i in eachindex(init_prob)
+        prob[i] = init_prob[i]
     end
 
     ltp, rtp = poisson_trunc_point(unif_rate * time, tol)
@@ -92,11 +104,11 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob::SparseVector, tim
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
         if k % ss_check_interval == 0
-            checkpoint -= prob
+            checkpoint .-= prob
             diff = maximum(abs, checkpoint)
             checkpiont = prob
             if  diff < tol
-                return prob
+                return FintimeProbSolution(prob)
             end
         end
     end
@@ -110,16 +122,62 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob::SparseVector, tim
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
         if (k - ltp + 1) % ss_check_interval == 0
-            checkpoint -= prob
+            checkpoint .-= prob
             diff = maximum(abs, checkpoint)
             checkpiont = prob
             if diff < tol
                 prob_t += prob * (1.0 - summed_term)
-                return prob_t
+                return FintimeProbSolution(prob_t)
             end
         end
     end
 
-    return prob_t
+    return FintimeProbSolution(prob_t)
 end
 
+
+function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_rate_factor=1.05, tol=1e-6, ss_check_interval=10)
+    unif_rate = max_out_rate(chain) * unif_rate_factor
+    P = trans_prob_matrix(chain, unif_rate)
+
+    qt = unif_rate * time
+    rtp = poisson_cum_rtp(qt, tol, time)
+
+    log_qt = log(qt)
+    tmpti = -qt
+    pterm = exp(tmpti)
+    right_cum = 1.0 - pterm
+    sum_right_cum = right_cum
+    
+    prob = fill(0.0, state_count(chain))
+    for i in eachindex(init_prob)
+        prob[i] = init_prob[i]
+    end
+    prob_old = copy(prob)
+    checkpoint = copy(prob)
+
+    sol = fill(0.0, length(prob))
+    @. sol += right_cum * prob
+    for i in 1:rtp
+        prob, prob_old = prob_old, prob
+        A_mul_B!(prob, P, prob_old)
+
+        tmpti += log_qt - log(i)
+        pterm = exp(tmpti)
+        right_cum -= pterm 
+        sum_right_cum += right_cum
+
+        @. sol += right_cum * prob
+        if i % ss_check_interval == 0
+            checkpoint .-= prob
+            diff = maximum(abs, checkpoint)
+            checkpiont = prob
+            if diff < tol
+                break;
+            end
+        end
+    end
+    sol .+= (time - sum_right_cum) * prob
+    sol .*= 1.0 / unif_rate
+    return FintimeCumSolution(sol)
+end

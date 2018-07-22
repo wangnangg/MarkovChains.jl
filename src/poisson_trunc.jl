@@ -116,3 +116,31 @@ function poisson_term_weight(λ, ltp::Integer, rtp::Integer, tol)
     wsum += weight[s]
     return weight, wsum
 end
+
+
+function poisson_cum_rtp(λ, tol, t)
+    underflow_th = 1e-30 
+    overflow_th = 1e30
+
+    log_qt = log(λ)
+    tmpti = -λ
+    p_term = exp(tmpti)
+    sumqt = p_term
+    rtp = 1
+
+    while p_term <= underflow_th
+        tmpti += log_qt - log(rtp)
+        p_term = exp(tmpti)
+        sumqt += p_term
+        rtp += 1
+    end
+
+    while (tol < t * (1.0 - sumqt)) && (p_term > underflow_th)
+        tmpti += log_qt - log(rtp)
+        p_term = exp(tmpti)
+        sumqt += p_term
+        rtp += 1
+    end
+
+    return rtp
+end

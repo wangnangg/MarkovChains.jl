@@ -13,7 +13,8 @@ importall MarkovChains
     n3 = add_state!(chain)
     add_transition!(chain, n1, n2, 2.0)
     add_transition!(chain, n2, n3, 4.0)
-    init_prob = sparsevec([1], [1.0])
+    init_prob = fill(0.0, state_count(chain))
+    init_prob[1] = 1.0
     res = inftime_solve(chain, init_prob)
     cumtime = collect(map(state -> state_cumtime(res, state), n1:n3))
     @test cumtime[n1] ≈ 0.5
@@ -36,7 +37,9 @@ end
     add_transition!(chain, n3, n2, 3.0)
     add_transition!(chain, n2, n1, 2.0)
     add_transition!(chain, n1, n0, 1.0)
-    init_prob = sparsevec([1, 2], [0.1, 0.9])
+    init_prob = fill(0.0, state_count(chain))
+    init_prob[1] = 0.1
+    init_prob[2] = 0.9
     res = inftime_solve(chain, init_prob)
     cumtime = collect(map(state -> state_cumtime(res, state), n0:n3))
     for t in cumtime
