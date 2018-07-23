@@ -39,6 +39,7 @@ end
     add_transition!(chain, n3, n2, 3.0)
     add_transition!(chain, n2, n1, 2.0)
     add_transition!(chain, n1, n0, 1.0)
+    Q = trans_rate_matrix(chain)
     init_prob = fill(0.0, state_count(chain))
     init_prob[1] = 0.1
     init_prob[2] = 0.9
