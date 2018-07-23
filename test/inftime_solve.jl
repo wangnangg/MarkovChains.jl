@@ -24,6 +24,8 @@ using MarkovChains
     @test prob[n1] ≈ 0
     @test prob[n2] ≈ 0
     @test prob[n3] ≈ 1
+
+    @test mean_time_to_absorption(chain, init_prob) == 0.75
 end
 @testset "irreducible1" begin
     chain = ContMarkovChain()
@@ -82,6 +84,8 @@ end
     for p in prob[[m1, m2, n1, n2]]
         @test p > 0
     end
+
+    @test isinf(mean_time_to_absorption(chain, init_prob))
 end
 @testset "multiple_comps_init_bottom" begin
     chain = ContMarkovChain()
@@ -126,6 +130,7 @@ end
     res = inftime_solve(chain, init_prob)
     @test state_cumtime(res, t0) == Inf
     @test state_prob(res, t0) == 1.0
+    @test mean_time_to_absorption(chain, init_prob) == 0.0
 end
 @testset "zero_state" begin
     chain = ContMarkovChain()

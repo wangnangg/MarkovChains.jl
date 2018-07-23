@@ -1,6 +1,6 @@
 importall .Graphs
 
-export inftime_solve, Reorder, InftimeStateResult, state_cumtime, state_prob
+export inftime_solve, Reorder, InftimeStateResult, state_cumtime, state_prob, mean_time_to_absorption
 struct Reorder
     mat2chain::Vector{Int}
     chain2mat::Vector{Int}
@@ -195,4 +195,24 @@ function inftime_solve(chain::ContMarkovChain, init_prob; spsolve=Base.:\)
         abs_start = abs_end + 1
     end
     return InftimeStateResult(order, sol)
+end
+
+
+function mean_time_to_absorption(sol::InftimeStateResult)
+    g_start = sol.reorder.ntransients + 1
+    for g in sol.reorder.recur_comp_member_count
+        if g > 1
+            for mat_idx in 1:g
+                if sol.solution[mat_idx] > 0
+                    return Inf
+                end
+            end
+        end
+    end
+    sum(sol.solution[1:sol.reorder.ntransients])
+end
+
+function mean_time_to_absorption(chain::ContMarkovChain, init_prob)
+    sol = inftime_solve(chain::ContMarkovChain, init_prob)
+    mean_time_to_absorption(sol)
 end
