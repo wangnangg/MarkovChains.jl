@@ -101,13 +101,12 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
         prob[i] = init_prob[i]
     end
 
-    ltp, rtp = poisson_trunc_point(unif_rate * time, tol)
-    weight, wsum = poisson_term_weight(unif_rate * time, ltp, rtp, tol)
+    ltp, rtp, poi_probs = poisson_trunc_point(unif_rate * time, tol)
 
     checkpoint = copy(prob)
     prob_old = copy(prob)
 
-    for k in 1:ltp
+    for k in 0:ltp-1
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
         if k % ss_check_interval == 0
@@ -119,21 +118,21 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
             end
         end
     end
-    summed_term = 0.0
+    term_sum = 0.0
     prob_t = fill(0.0, length(prob))
     for k in ltp:rtp
-        p_term = weight[k - ltp + 1] / wsum
-        summed_term += p_term
-        prob_t += p_term * prob
+        term = poi_probs[k - ltp + 1]
+        term_sum += term
+        @. prob_t += term * prob
 
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
         if (k - ltp + 1) % ss_check_interval == 0
-            checkpoint .-= prob
+            @. checkpoint -= prob
             diff = maximum(abs, checkpoint)
-            checkpoint .= prob
+            @. checkpoint = prob
             if diff < tol
-                prob_t += prob * (1.0 - summed_term)
+                @. prob_t += prob * (1.0 - term_sum)
                 return FintimeProbSolution(prob_t)
             end
         end
@@ -150,7 +149,7 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
     Matrix{Float64}(P)
 
     qt = unif_rate * time
-    rtp = poisson_cum_rtp(qt, tol, time)
+    rtp = poisson_cum_rtp(qt, time, tol)
 
     log_qt = log(qt)
     tmpti = -qt
