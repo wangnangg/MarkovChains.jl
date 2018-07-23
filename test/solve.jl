@@ -5,8 +5,8 @@ else
 end
 
 using MarkovChains
-@testset "fintime_solve" begin
-    @testset "irreducible1_prob" begin
+@testset "solve" begin
+    @testset "irreducible1" begin
         chain = ContMarkovChain()
         n0 = add_state!(chain)
         n1 = add_state!(chain)
@@ -27,7 +27,7 @@ using MarkovChains
         @test ss_sol.prob ≈ [0.375, 0.375, 0.1875, 0.0625]
         @test ss_sol.cumtime == [Inf, Inf, Inf, Inf]
     end
-    @testset "acyclic1_cum" begin
+    @testset "acyclic1" begin
     chain = ContMarkovChain()
     n1 = add_state!(chain)
     n2 = add_state!(chain)

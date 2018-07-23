@@ -1,4 +1,4 @@
-importall .Graphs
+using .Graphs
 
 export inftime_solve, Reorder, InftimeStateResult, state_cumtime, state_prob, mean_time_to_absorption
 struct Reorder

@@ -1,4 +1,4 @@
-importall .Graphs
+using .Graphs
 
 export ContMarkovChain, add_state!, add_transition!, state_count
 
