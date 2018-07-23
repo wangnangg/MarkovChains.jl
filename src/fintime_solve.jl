@@ -85,6 +85,12 @@ function state_cumtime(sol::Union{FintimeCumSolution, FintimeSolution}, state::I
     return sol.cumtime[state]
 end
 
+function fintime_solve(chain, init_prob, time)
+    prob = fintime_solve_prob(chain, init_prob, time)
+    cum = fintime_solve_cum(chain, init_prob, time)
+    FintimeSolution(prob.prob, cum.cumtime)
+end
+
 function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_rate_factor=1.05, tol=1e-6, ss_check_interval=10)
     @assert unif_rate_factor >= 1.0
     unif_rate = max_out_rate(chain) * unif_rate_factor
@@ -106,7 +112,7 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
         if k % ss_check_interval == 0
             checkpoint .-= prob
             diff = maximum(abs, checkpoint)
-            checkpiont = prob
+            checkpoint .= prob
             if  diff < tol
                 return FintimeProbSolution(prob)
             end
@@ -124,7 +130,7 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
         if (k - ltp + 1) % ss_check_interval == 0
             checkpoint .-= prob
             diff = maximum(abs, checkpoint)
-            checkpiont = prob
+            checkpoint .= prob
             if diff < tol
                 prob_t += prob * (1.0 - summed_term)
                 return FintimeProbSolution(prob_t)
@@ -139,6 +145,8 @@ end
 function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_rate_factor=1.05, tol=1e-6, ss_check_interval=10)
     unif_rate = max_out_rate(chain) * unif_rate_factor
     P = trans_prob_matrix(chain, unif_rate)
+    trans_rate_matrix(chain)
+    Matrix{Float64}(P)
 
     qt = unif_rate * time
     rtp = poisson_cum_rtp(qt, tol, time)
@@ -158,6 +166,7 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
 
     sol = fill(0.0, length(prob))
     @. sol += right_cum * prob
+    ss_reached = false
     for i in 1:rtp
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
@@ -167,17 +176,21 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
         right_cum -= pterm 
         sum_right_cum += right_cum
 
+        right_cum
         @. sol += right_cum * prob
         if i % ss_check_interval == 0
             checkpoint .-= prob
             diff = maximum(abs, checkpoint)
-            checkpiont = prob
+            checkpoint .= prob
             if diff < tol
+                ss_reached = true
                 break;
             end
         end
     end
-    sol .+= (time - sum_right_cum) * prob
     sol .*= 1.0 / unif_rate
+    if ss_reached
+        @. sol += (time - sum_right_cum / unif_rate) * prob
+    end
     return FintimeCumSolution(sol)
 end

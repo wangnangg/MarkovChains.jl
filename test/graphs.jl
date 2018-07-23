@@ -4,7 +4,7 @@ else
     using Test
 end
 
-importall MarkovChains.Graphs
+using MarkovChains.Graphs
 @testset "digraph" begin
     @testset "search_dfs" begin
         dg = Digraph()

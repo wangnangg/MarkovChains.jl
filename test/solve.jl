@@ -19,11 +19,13 @@ using MarkovChains
         add_transition!(chain, n2, n1, 2.0)
         add_transition!(chain, n1, n0, 1.0)
         init_prob = sparsevec([1, 2], [0.1, 0.9])
-        res = fintime_solve_prob(chain, init_prob, 0.0).prob
-        @test res ≈ [0.1, 0.9, 0.0, 0.0]
+        ts_sol = solve(chain, init_prob, 0.0)
+        @test ts_sol.prob ≈ [0.1, 0.9, 0.0, 0.0]
+        @test ts_sol.cumtime ≈ [0.0, 0.0, 0.0, 0.0]
 
-        res = fintime_solve_prob(chain, init_prob, 20.0).prob
-        @test res ≈ [0.375, 0.375, 0.1875, 0.0625]
+        ss_sol = solve(chain, init_prob, Inf)
+        @test ss_sol.prob ≈ [0.375, 0.375, 0.1875, 0.0625]
+        @test ss_sol.cumtime == [Inf, Inf, Inf, Inf]
     end
     @testset "acyclic1_cum" begin
     chain = ContMarkovChain()
@@ -33,24 +35,20 @@ using MarkovChains
     add_transition!(chain, n1, n2, 2.0)
     add_transition!(chain, n2, n3, 4.0)
     init_prob = sparsevec([1], [1.0])
-    res = fintime_solve_cum(chain, init_prob, 100)
-    cumtime = collect(map(state -> state_cumtime(res, state), n1:n3))
-    @test cumtime[n1] ≈ 0.5
-    @test cumtime[n2] ≈ 0.25
-    end
 
-    @testset "two_state_cum" begin
-    chain = ContMarkovChain()
-    n1 = add_state!(chain)
-    n2 = add_state!(chain)
-    add_transition!(chain, n1, n2, 2.0)
-    add_transition!(chain, n2, n1, 4.0)
-    init_prob = sparsevec([1, 2], [0.2, 0.8])
+    ts_sol = solve(chain, init_prob, 0.0)
+    @test ts_sol.prob ≈ [1.0, 0.0, 0.0]
 
-    t = 10.0
-    sol = solve(chain, init_prob, t)
-    t1 = state_cumtime(sol, n1)
-    t2 = state_cumtime(sol, n2)
-    @test t1 + t2 ≈ t
+    ts_sol = solve(chain, init_prob, 1.0)
+    @test state_prob(ts_sol, 1) < 1.0
+    @test state_prob(ts_sol, 2) > 0.0
+    @test state_prob(ts_sol, 3) > 0.0
+
+    ss_sol = solve(chain, init_prob, Inf)
+    @test state_cumtime(ss_sol, 1) == 0.5
+    @test state_cumtime(ss_sol, 2) == 0.25
+    @test state_cumtime(ss_sol, 3) == Inf
+    @test ss_sol.prob ≈ [0.0, 0.0, 1.0]
+
     end
 end

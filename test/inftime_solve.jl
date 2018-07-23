@@ -4,7 +4,7 @@ else
     using Test
 end
 
-importall MarkovChains
+using MarkovChains
 @testset "inftime_solve" begin
 @testset "acyclic1" begin
     chain = ContMarkovChain()
