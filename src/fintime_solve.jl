@@ -148,21 +148,18 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
     trans_rate_matrix(chain)
     Matrix{Float64}(P)
 
-    qt = unif_rate * time
-    rtp = poisson_cum_rtp(qt, time, tol)
-
-    log_qt = log(qt)
-    tmpti = -qt
-    pterm = exp(tmpti)
-    right_cum = 1.0 - pterm
-    sum_right_cum = right_cum
-    
     prob = fill(0.0, state_count(chain))
     for i in eachindex(init_prob)
         prob[i] = init_prob[i]
     end
     prob_old = copy(prob)
     checkpoint = copy(prob)
+
+    qt = unif_rate * time
+    rtp, poi_probs = poisson_cum_rtp(qt, time, tol)
+    right_cum = 1.0 - poi_probs[1]
+    sum_right_cum = right_cum
+    
 
     sol = fill(0.0, length(prob))
     @. sol += right_cum * prob
@@ -171,12 +168,9 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
 
-        tmpti += log_qt - log(i)
-        pterm = exp(tmpti)
-        right_cum -= pterm 
+        right_cum -= poi_probs[i + 1]
         sum_right_cum += right_cum
 
-        right_cum
         @. sol += right_cum * prob
         if i % ss_check_interval == 0
             checkpoint .-= prob

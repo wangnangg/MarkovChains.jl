@@ -39,13 +39,18 @@ function poisson_cum_rtp(λ, t, tol)
     expo = -λ
     term = exp(expo)
     term_sum = term
+    probs = Vector{Float64}()
+
+    push!(probs, term)
 
     while tol < t * (1.0 - term_sum)
         k += 1.0
         expo += log_λ - log(k)
         term = exp(expo)
         term_sum += term
+        push!(probs, term)
     end
-
-    return Int(k)
+    rtp = Int(k)
+    @assert rtp + 1 == length(probs)
+    return rtp, probs
 end
