@@ -1,3 +1,4 @@
+using Base.LinAlg
 
 function max_out_rate(chain)
     max = 0
