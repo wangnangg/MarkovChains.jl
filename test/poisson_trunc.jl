@@ -14,5 +14,7 @@ using MarkovChains
     @test abs(1.0 - sum(probs)) < tol
     λ = 400.0
     ltp, rtp, probs = poisson_trunc_point(λ, tol)
+    @test ltp == 306
+    @test rtp == 502
     @test abs(1.0 - sum(probs)) < tol
 end

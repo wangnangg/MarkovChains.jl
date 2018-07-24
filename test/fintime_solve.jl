@@ -25,7 +25,7 @@ using MarkovChains
         res = fintime_solve_prob(chain, init_prob, 20.0).prob
         @test res ≈ [0.375, 0.375, 0.1875, 0.0625]
     end
-    @testset "acyclic1_cum" begin
+    @testset "acyclic1" begin
     chain = ContMarkovChain()
     n1 = add_state!(chain)
     n2 = add_state!(chain)
@@ -37,6 +37,12 @@ using MarkovChains
     cumtime = collect(map(state -> state_cumtime(res, state), n1:n3))
     @test cumtime[n1] ≈ 0.5
     @test cumtime[n2] ≈ 0.25
+
+    res = solve(chain, init_prob, 1.0)
+    @test state_prob(res, n1) ≈ e ^ (-2.0 * 1.0)
+
+    res = solve(chain, init_prob, 4.0)
+    @test abs(state_prob(res, n1) - e ^ (-2.0 * 4.0)) < 1e-6
     end
 
     @testset "two_state_cum" begin

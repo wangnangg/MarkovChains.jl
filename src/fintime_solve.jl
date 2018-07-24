@@ -109,7 +109,7 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
     for k in 0:ltp-1
         prob, prob_old = prob_old, prob
         A_mul_B!(prob, P, prob_old)
-        if k % ss_check_interval == 0
+        if (k + 1) % ss_check_interval == 0
             checkpoint .-= prob
             diff = maximum(abs, checkpoint)
             checkpoint .= prob
