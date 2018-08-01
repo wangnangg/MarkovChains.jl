@@ -5,6 +5,7 @@ include("graphs.jl")
 include("markov_chain.jl")
 include("inftime_solve.jl")
 include("fintime_solve.jl")
+include("plot.jl")
 
 struct CtmcSolution
     prob::Vector{Float64}

@@ -14,6 +14,9 @@ struct Digraph
     function Digraph()
         new(Vector{NodeProp}(), Vector{EdgeProp}())
     end
+    function Digraph(num_nodes::Integer)
+        new([NodeProp(Vector{Int}()) for _ in 1:num_nodes], Vector{EdgeProp}())
+    end
 end
 
 export Digraph

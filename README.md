@@ -3,10 +3,15 @@
 [![Build Status](https://travis-ci.org/wangnangg/MarkovChains.jl.svg?branch=master)](https://travis-ci.org/wangnangg/MarkovChains.jl)
 [![Coverage Status](https://coveralls.io/repos/github/wangnangg/MarkovChains.jl/badge.svg?branch=master)](https://coveralls.io/github/wangnangg/MarkovChains.jl?branch=master)
 
-This pacakge provides functions to solve continuous time Markov chains for state probablities or accumulated sojourn times at a certain time point, including time infinity.
+This pacakge provides functions to solve continuous time Markov chains for state
+probablities or accumulated sojourn times at a certain time point, including
+time infinity.
+
+# Tutorial
+Here's a detailed [tutorial](doc/tutorial.ipynb) on how to use this package.
 
 # Example
-## an birth-death chain
+## A birth-death chain
 The following example is about solving a 4 states birth-death chain at time 0.1, 1.0, and infinity.
 
 ```julia
@@ -36,7 +41,7 @@ sol = solve(chain, init_prob, Inf)
 @show state_prob(sol, n1)
 # state_prob(sol, n1) = 0.375
 ```
-## a chain with absorbing states
+## A chain with absorbing states
 The following example is about solving a 3 states chain with absorbing states.
 
 ```julia
