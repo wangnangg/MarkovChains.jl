@@ -1,8 +1,4 @@
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using Test
-end
+using Test
 
 using MarkovChains
 @testset "inftime_solve" begin
@@ -59,7 +55,7 @@ end
     m1 = add_state!(chain)
     m2 = add_state!(chain)
     n1 = add_state!(chain)
-    n2 = add_state!(chain)  
+    n2 = add_state!(chain)
     add_transition!(chain, t0, t1, 1.0)
     add_transition!(chain, t1, t2, 1.0)
     add_transition!(chain, t2, t1, 2.0)
@@ -69,7 +65,8 @@ end
     add_transition!(chain, m2, m1, 1.0)
     add_transition!(chain, n1, n2, 2.0)
     add_transition!(chain, n2, n1, 1.0)
-    init_prob = sparsevec([1], [1.0])
+    init_prob = fill(0.0, state_count(chain))
+    init_prob[1] = 1.0
     res = inftime_solve(chain, init_prob)
     cumtime = collect(map(state -> state_cumtime(res, state), t0:n2))
     for t in cumtime[[m1, m2, n1, n2]]
@@ -88,6 +85,7 @@ end
 
     @test isinf(mean_time_to_absorption(chain, init_prob))
 end
+using SparseArrays
 @testset "multiple_comps_init_bottom" begin
     chain = ContMarkovChain()
     t0 = add_state!(chain)
@@ -96,7 +94,7 @@ end
     m1 = add_state!(chain)
     m2 = add_state!(chain)
     n1 = add_state!(chain)
-    n2 = add_state!(chain)  
+    n2 = add_state!(chain)
     add_transition!(chain, t0, t1, 1.0)
     add_transition!(chain, t1, t2, 1.0)
     add_transition!(chain, t2, t1, 2.0)

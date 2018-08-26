@@ -8,7 +8,7 @@ probablities or accumulated sojourn times at a certain time point, including
 time infinity.
 
 # Tutorial
-Here's a detailed [tutorial](doc/tutorial.ipynb) on how to use this package.
+Here's a detailed [tutorial](docs/tutorial.ipynb) on how to use this package.
 
 # Example
 ## A birth-death chain

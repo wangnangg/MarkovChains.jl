@@ -15,11 +15,10 @@ function chain_to_lightgraph(chain)
 end
 
 function plot_chain(chain; state_labels=Vector{String}(), transition_labels=Dict{Tuple{Int,Int},String}(),
-     state_style="draw, rounded corners, fill=white", 
+     state_style="draw, rounded corners, fill=white",
      state_styles=Dict(),
-     transition_style="bend left=30", 
+     transition_style="bend left=30",
      transition_styles=Dict(),
-     hide_transition_label=false,
      scale=1.5,
      layout=TikzGraphs.Layouts.Layered())
     if length(state_labels) == 0
@@ -34,9 +33,10 @@ function plot_chain(chain; state_labels=Vector{String}(), transition_labels=Dict
         end
     end
     g = chain_to_lightgraph(chain)
-    TikzGraphs.plot(g; layout=layout, 
-    labels=state_labels, edge_labels=hide_transition_label? Dict() : transition_labels, 
-    node_style=state_style, 
+    TikzGraphs.plot(g; layout=layout,
+    labels=state_labels,
+    edge_labels=transition_labels,
+    node_style=state_style,
     node_styles=state_styles,
     edge_style=transition_style,
     edge_styles=transition_styles,

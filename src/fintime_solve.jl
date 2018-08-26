@@ -1,4 +1,5 @@
-using Base.LinAlg
+using LinearAlgebra
+using SparseArrays
 
 function max_out_rate(chain)
     max = 0
@@ -108,7 +109,7 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
 
     for k in 0:ltp-1
         prob, prob_old = prob_old, prob
-        A_mul_B!(prob, P, prob_old)
+        mul!(prob, P, prob_old)
         if (k + 1) % ss_check_interval == 0
             checkpoint .-= prob
             diff = maximum(abs, checkpoint)
@@ -126,7 +127,7 @@ function fintime_solve_prob(chain::ContMarkovChain, init_prob, time::Real; unif_
         @. prob_t += term * prob
 
         prob, prob_old = prob_old, prob
-        A_mul_B!(prob, P, prob_old)
+        mul!(prob, P, prob_old)
         if (k - ltp + 1) % ss_check_interval == 0
             @. checkpoint -= prob
             diff = maximum(abs, checkpoint)
@@ -159,14 +160,14 @@ function fintime_solve_cum(chain::ContMarkovChain, init_prob, time::Real; unif_r
     rtp, poi_probs = poisson_cum_rtp(qt, time, tol)
     right_cum = 1.0 - poi_probs[1]
     sum_right_cum = right_cum
-    
+
 
     sol = fill(0.0, length(prob))
     @. sol += right_cum * prob
     ss_reached = false
     for i in 1:rtp
         prob, prob_old = prob_old, prob
-        A_mul_B!(prob, P, prob_old)
+        mul!(prob, P, prob_old)
 
         right_cum -= poi_probs[i + 1]
         sum_right_cum += right_cum

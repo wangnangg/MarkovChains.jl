@@ -27,7 +27,7 @@ function reorder_states(chain::ContMarkovChain)::Reorder
         extend!(mat2chain, comp.members)
         push!(recur_comp_member_count, length(comp.members))
     end
-    chain2mat = Vector{Int}(length(mat2chain))
+    chain2mat = Vector{Int}(undef, length(mat2chain))
     for i in 1:length(mat2chain)
         chain2mat[mat2chain[i]] = i
     end
@@ -158,7 +158,7 @@ end
 """
     inftime_state(chain, init_prob; spsolve)
 
-compute state cumulative times/probabilites of the markov chain at time infinity. 
+compute state cumulative times/probabilites of the markov chain at time infinity.
 `state_prob` and `state_cumtime` can be used to retrieve times/probs from the return value.
 """
 function inftime_solve(chain::ContMarkovChain, init_prob; spsolve=Base.:\)

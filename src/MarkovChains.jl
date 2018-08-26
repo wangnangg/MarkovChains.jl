@@ -26,8 +26,8 @@ end
 
 function solve(chain, init_prob, time)
     n = state_count(chain)
-    prob = Vector{Float64}(n)
-    cumtime = Vector{Float64}(n)
+    prob = Vector{Float64}(undef, n)
+    cumtime = Vector{Float64}(undef, n)
     if isinf(time)
         sol = inftime_solve(chain, init_prob)
         for i in 1:n

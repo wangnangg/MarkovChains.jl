@@ -29,7 +29,7 @@ end
 
 state_count(chain) = node_count(chain.state_graph)
 states(chain) = nodes(chain.state_graph)
-function transitions(chain) 
+function transitions(chain)
     ts = Vector{Transition}()
     for eid in edges(chain.state_graph)
         ep = chain.state_graph.edge_props[eid]

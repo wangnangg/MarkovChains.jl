@@ -1,8 +1,4 @@
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using Test
-end
+using Test
 
 using MarkovChains
 @testset "solve" begin
@@ -18,7 +14,7 @@ using MarkovChains
         add_transition!(chain, n3, n2, 3.0)
         add_transition!(chain, n2, n1, 2.0)
         add_transition!(chain, n1, n0, 1.0)
-        init_prob = sparsevec([1, 2], [0.1, 0.9])
+        init_prob = [0.1, 0.9, 0.0, 0.0]
         ts_sol = solve(chain, init_prob, 0.0)
         @test ts_sol.prob ≈ [0.1, 0.9, 0.0, 0.0]
         @test ts_sol.cumtime ≈ [0.0, 0.0, 0.0, 0.0]
@@ -34,8 +30,7 @@ using MarkovChains
     n3 = add_state!(chain)
     add_transition!(chain, n1, n2, 2.0)
     add_transition!(chain, n2, n3, 4.0)
-    init_prob = sparsevec([1], [1.0])
-
+    init_prob = [1.0, 0.0, 0.0]
     ts_sol = solve(chain, init_prob, 0.0)
     @test ts_sol.prob ≈ [1.0, 0.0, 0.0]
 
