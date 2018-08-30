@@ -1,8 +1,4 @@
 julia 0.7-
 
 LightGraphs
-LinearAlgebra
-SparseArrays
-Test
 TikzGraphs
-TikzPictures
